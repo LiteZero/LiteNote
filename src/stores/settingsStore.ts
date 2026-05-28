@@ -13,6 +13,7 @@ export interface SettingsState {
   panelOpacity: number;
   localeMode: LocaleMode;
   alwaysOnTop: boolean;
+  autoStart: boolean;
   initialized: boolean;
   /** 最近一次 DB 写入错误信息，供 UI 展示 */
   lastError: string | null;
@@ -24,6 +25,7 @@ export interface SettingsActions {
   setLocaleMode: (m: LocaleMode) => void;
   setClockCollapsed: (v: boolean) => void;
   setAlwaysOnTop: (v: boolean) => void;
+  setAutoStart: (v: boolean) => void;
   /** 供外部同步调用：用 DB 最新值覆盖 store */
   reloadFromDb: () => Promise<void>;
   clearError: () => void;
@@ -62,6 +64,19 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
     init: async () => {
       const settings = await loadSettings();
       set({ ...settings, initialized: true });
+
+      // 启动时同步 autostart 插件状态与保存的设置
+      if (settings.autoStart) {
+        import("@tauri-apps/plugin-autostart")
+          .then(({ enable }) => {
+            enable().catch((e) =>
+              console.error("[LiteNote] autostart init enable failed:", e),
+            );
+          })
+          .catch((e) =>
+            console.error("[LiteNote] autostart import failed:", e),
+          );
+      }
     },
 
     reloadFromDb: async () => {
@@ -110,6 +125,25 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       dbWrite(
         saveSetting("alwaysOnTop", v),
         "saveSetting(alwaysOnTop)",
+        (msg) => set({ lastError: msg }),
+        emitSettingsChanged,
+      );
+    },
+
+    setAutoStart: (v) => {
+      set({ autoStart: v });
+      // 同步调用 autostart 插件启用/禁用
+      import("@tauri-apps/plugin-autostart").then(({ enable, disable }) => {
+        if (v) {
+          enable().catch((e) => console.error("[LiteNote] autostart enable failed:", e));
+        } else {
+          disable().catch((e) => console.error("[LiteNote] autostart disable failed:", e));
+        }
+      }).catch((e) => console.error("[LiteNote] autostart import failed:", e));
+
+      dbWrite(
+        saveSetting("autoStart", v),
+        "saveSetting(autoStart)",
         (msg) => set({ lastError: msg }),
         emitSettingsChanged,
       );

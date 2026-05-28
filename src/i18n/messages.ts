@@ -45,6 +45,7 @@ export const messages = {
     settingsLanguage: "语言",
     opacityLabel: "透明度",
     showClockSection: "显示时钟区",
+    autoStart: "开机自动启动",
     settingsOpenFailed: "无法打开设置窗口。",
   },
   en: {
@@ -95,6 +96,7 @@ export const messages = {
     settingsLanguage: "Language",
     opacityLabel: "Opacity",
     showClockSection: "Show clock section",
+    autoStart: "Launch at startup",
     settingsOpenFailed: "Could not open Settings.",
   },
 } as const;

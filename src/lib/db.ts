@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS = {
   panelOpacity: 0.88,
   localeMode: "system" as LocaleMode,
   alwaysOnTop: false,
+  autoStart: true,
 };
 
 /** 设置项的运行时类型（非字面量） */
@@ -23,6 +24,7 @@ export interface AppSettings {
   readonly panelOpacity: number;
   readonly localeMode: LocaleMode;
   readonly alwaysOnTop: boolean;
+  readonly autoStart: boolean;
 }
 
 export async function getDb(): Promise<Database> {

@@ -10,6 +10,8 @@ interface SettingsFormProps {
   onPanelOpacityChange: (v: number) => void;
   clockCollapsed: boolean;
   onSetClockCollapsed: (v: boolean) => void;
+  autoStart: boolean;
+  onSetAutoStart: (v: boolean) => void;
 }
 
 const row =
@@ -25,6 +27,8 @@ export function SettingsForm({
   onPanelOpacityChange,
   clockCollapsed,
   onSetClockCollapsed,
+  autoStart,
+  onSetAutoStart,
 }: SettingsFormProps) {
   const mk = (key: MessageKey) => t(locale, key);
 
@@ -53,6 +57,15 @@ export function SettingsForm({
               className="h-4 w-4 shrink-0 accent-sky-500"
               checked={!clockCollapsed}
               onChange={(e) => onSetClockCollapsed(!e.target.checked)}
+            />
+          </label>
+          <label className={`${row} cursor-pointer`}>
+            <span>{mk("autoStart")}</span>
+            <input
+              type="checkbox"
+              className="h-4 w-4 shrink-0 accent-sky-500"
+              checked={autoStart}
+              onChange={(e) => onSetAutoStart(e.target.checked)}
             />
           </label>
         </div>
