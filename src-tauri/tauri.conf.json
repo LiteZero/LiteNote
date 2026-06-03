@@ -39,7 +39,11 @@
   },
   "plugins": {
     "nsis": {
-      "portable": true
+      "portable": true,
+      "webviewInstallMode": {
+        "type": "embedBootstrapper",
+        "silent": true
+      }
     }
   }
 }
