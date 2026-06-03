@@ -147,6 +147,11 @@ export function WidgetShell() {
     }
   }, []);
 
+  // 添加待办时，若当前选中了日期则自动附上截止时间（当天 23:59:59）
+  const handleAddWithDate = useCallback(() => {
+    handleAdd(selectedDate !== null ? endOfDay(selectedDate) : undefined);
+  }, [handleAdd, selectedDate]);
+
   // 拖拽传感器
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -162,7 +167,7 @@ export function WidgetShell() {
     setActiveDragId(String(event.active.id));
   }, []);
 
-  // 统一拖拽结束处理：排序 or 设置截止日期
+  // 统一拖拽结束处理：排序 or 设置截止日期（循环待办不允许拖到日历改日期）
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
@@ -176,13 +181,17 @@ export function WidgetShell() {
       const overData = over.data.current as { type?: string; date?: number } | undefined;
 
       if (overData?.type === "day" && overData.date) {
-        setTodoDueDate(activeId, overData.date);
-        setSelectedDate(overData.date);
+        // 循环待办不允许拖到日历修改日期
+        const todo = todos.find((t) => t.id === activeId);
+        if (!todo?.isRecurring) {
+          setTodoDueDate(activeId, endOfDay(overData.date));
+          setSelectedDate(overData.date);
+        }
       } else if (activeId !== overId) {
         reorderTodos(activeId, overId);
       }
     },
-    [setTodoDueDate, reorderTodos],
+    [setTodoDueDate, reorderTodos, todos],
   );
 
   return (
@@ -271,7 +280,7 @@ export function WidgetShell() {
         <FooterBar
           locale={locale}
           clearCompletedDisabled={completedCount === 0}
-          onAdd={handleAdd}
+          onAdd={handleAddWithDate}
           onClearClick={() => setConfirmClear(true)}
         />
       </div>

@@ -47,11 +47,14 @@ export function useWidgetActions() {
   );
 
   // ── 操作回调 ──
-  const handleAdd = useCallback(() => {
+  const handleAdd = useCallback((dueDate?: number) => {
     const id = addTodo();
     setSelectedId(id);
     setEditingId(id);
-  }, [addTodo]);
+    if (dueDate !== undefined && dueDate > 0) {
+      setTodoDueDate(id, dueDate);
+    }
+  }, [addTodo, setTodoDueDate]);
 
   const handleSelect = useCallback((id: string) => {
     setSelectedId(id);
