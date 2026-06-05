@@ -31,8 +31,6 @@ export const messages = {
     dueClear: "清除截止",
     duePickerTitle: "选择截止时间",
     helpTitle: "帮助",
-    helpText: "轻签 LiteNote — 本地待办小部件。\n关闭窗口将隐藏到托盘（若已接入）。",
-    helpOpenFailed: "无法打开帮助窗口。",
     language: "语言",
     langSystem: "跟随系统",
     langZh: "简体中文",
@@ -98,9 +96,6 @@ export const messages = {
     dueClear: "Clear due date",
     duePickerTitle: "Pick due date",
     helpTitle: "Help",
-    helpText:
-      "LiteNote — local to-do widget.\nClosing hides to tray when integrated.",
-    helpOpenFailed: "Could not open Help.",
     language: "Language",
     langSystem: "Match system",
     langZh: "Simplified Chinese",

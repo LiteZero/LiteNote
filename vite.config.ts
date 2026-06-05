@@ -44,7 +44,6 @@ export default defineConfig(async () => ({
     rollupOptions: {
       input: {
         main: path.resolve(rootDir, "index.html"),
-        help: path.resolve(rootDir, "help.html"),
       },
     },
   },

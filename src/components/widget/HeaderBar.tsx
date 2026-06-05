@@ -9,7 +9,7 @@ interface HeaderBarProps {
   alwaysOnTop: boolean;
   onToggleAlwaysOnTop: () => void;
   onOpenSettings: () => void;
-  onOpenHelp: () => void;
+  onOpenAbout: () => void;
   onHide: () => void;
 }
 
@@ -22,7 +22,7 @@ export function HeaderBar({
   alwaysOnTop,
   onToggleAlwaysOnTop,
   onOpenSettings,
-  onOpenHelp,
+  onOpenAbout,
   onHide,
 }: HeaderBarProps) {
   const mk = (key: MessageKey) => t(locale, key);
@@ -60,12 +60,12 @@ export function HeaderBar({
           className={iconBtn}
           style={iconStyle}
           title={mk("helpTitle")}
-          onClick={onOpenHelp}
+          onClick={onOpenAbout}
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M12 16v-1a2 2 0 0 1 2-2h0a2 2 0 0 0 2-2v-.5a3 3 0 1 0-6 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <circle cx="12" cy="18.5" r="0.5" fill="currentColor" />
+            <line x1="12" y1="8" x2="12" y2="8.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <line x1="12" y1="12" x2="12" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
         <button

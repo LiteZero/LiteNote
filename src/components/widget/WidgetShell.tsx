@@ -15,7 +15,7 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { resolveLocale, t } from "@/i18n";
-import { openHelpWindow } from "@/lib/openHelpWindow";
+import { AboutModal } from "./AboutModal";
 import { useWidgetActions } from "@/hooks/useWidgetActions";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTodoStore } from "@/stores/todoStore";
@@ -64,6 +64,7 @@ export function WidgetShell() {
   // 周日历选中日期（null 表示不筛选）
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   // 直接获取 setTodoDueDate（拖拽到日历日期时需用）
   const setTodoDueDate = useTodoStore((s) => s.setTodoDueDate);
@@ -225,13 +226,7 @@ export function WidgetShell() {
           locale={locale}
           alwaysOnTop={alwaysOnTop}
           onToggleAlwaysOnTop={() => setAlwaysOnTop(!alwaysOnTop)}
-          onOpenHelp={() =>
-            void openHelpWindow({
-              locale,
-              title: `${t(locale, "appName")} · ${t(locale, "helpTitle")}`,
-              fallbackAlertBody: t(locale, "helpOpenFailed"),
-            })
-          }
+          onOpenAbout={() => setShowAbout(true)}
           onOpenSettings={() => setShowSettings(true)}
           onHide={handleHide}
         />
@@ -302,6 +297,13 @@ export function WidgetShell() {
           theme={theme}
           onSetTheme={setTheme}
           onClose={() => setShowSettings(false)}
+        />
+
+        {/* 关于模态框 */}
+        <AboutModal
+          open={showAbout}
+          locale={locale}
+          onClose={() => setShowAbout(false)}
         />
       </div>
 
