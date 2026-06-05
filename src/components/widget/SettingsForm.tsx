@@ -1,6 +1,7 @@
 import type { Locale, LocaleMode } from "@/i18n";
 import type { MessageKey } from "@/i18n/messages";
 import { t } from "@/i18n";
+import type { ThemeId } from "@/lib/db";
 
 interface SettingsFormProps {
   locale: Locale;
@@ -12,6 +13,8 @@ interface SettingsFormProps {
   onSetClockCollapsed: (v: boolean) => void;
   autoStart: boolean;
   onSetAutoStart: (v: boolean) => void;
+  theme: ThemeId;
+  onSetTheme: (t: ThemeId) => void;
 }
 
 const row =
@@ -29,6 +32,8 @@ export function SettingsForm({
   onSetClockCollapsed,
   autoStart,
   onSetAutoStart,
+  theme,
+  onSetTheme,
 }: SettingsFormProps) {
   const mk = (key: MessageKey) => t(locale, key);
 
@@ -68,6 +73,37 @@ export function SettingsForm({
               onChange={(e) => onSetAutoStart(e.target.checked)}
             />
           </label>
+        </div>
+      </section>
+
+      <section>
+        <h3 className={sectionTitle}>{mk("themeLabel")}</h3>
+        <div
+          className="space-y-1 rounded-lg border border-neutral-200 bg-white p-1"
+          role="radiogroup"
+          aria-label={mk("themeLabel")}
+        >
+          {(
+            [
+              ["glass", "themeGlass"] as const,
+              ["dark", "themeDark"] as const,
+              ["light", "themeLight"] as const,
+            ] as const
+          ).map(([mode, labelKey]) => (
+            <label
+              key={mode}
+              className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-100 has-[:focus-visible]:bg-neutral-100"
+            >
+              <input
+                type="radio"
+                name="theme"
+                className="accent-sky-500"
+                checked={theme === mode}
+                onChange={() => onSetTheme(mode)}
+              />
+              <span>{mk(labelKey)}</span>
+            </label>
+          ))}
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import {
   loadSettings,
   saveSetting,
   DEFAULT_SETTINGS,
+  type ThemeId,
 } from "@/lib/db";
 
 // ──────────────── 类型定义 ────────────────
@@ -14,6 +15,7 @@ export interface SettingsState {
   localeMode: LocaleMode;
   alwaysOnTop: boolean;
   autoStart: boolean;
+  theme: ThemeId;
   initialized: boolean;
   /** 最近一次 DB 写入错误信息，供 UI 展示 */
   lastError: string | null;
@@ -26,6 +28,7 @@ export interface SettingsActions {
   setClockCollapsed: (v: boolean) => void;
   setAlwaysOnTop: (v: boolean) => void;
   setAutoStart: (v: boolean) => void;
+  setTheme: (t: ThemeId) => void;
   /** 供外部同步调用：用 DB 最新值覆盖 store */
   reloadFromDb: () => Promise<void>;
   clearError: () => void;
@@ -144,6 +147,16 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       dbWrite(
         saveSetting("autoStart", v),
         "saveSetting(autoStart)",
+        (msg) => set({ lastError: msg }),
+        emitSettingsChanged,
+      );
+    },
+
+    setTheme: (t) => {
+      set({ theme: t });
+      dbWrite(
+        saveSetting("theme", t),
+        "saveSetting(theme)",
         (msg) => set({ lastError: msg }),
         emitSettingsChanged,
       );

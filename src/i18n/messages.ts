@@ -60,6 +60,10 @@ export const messages = {
     recurPickTime: "选择时间",
     reminderTitle: "轻签 · 待办提醒",
     emptyTodo: "(空)",
+    themeLabel: "主题",
+    themeGlass: "毛玻璃",
+    themeDark: "深色",
+    themeLight: "浅色",
   },
   en: {
     appName: "LiteNote",
@@ -124,6 +128,10 @@ export const messages = {
     recurPickTime: "Time",
     reminderTitle: "LiteNote · To-do reminder",
     emptyTodo: "(empty)",
+    themeLabel: "Theme",
+    themeGlass: "Glass",
+    themeDark: "Dark",
+    themeLight: "Light",
   },
 } as const;
 

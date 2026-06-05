@@ -70,12 +70,12 @@ function DayCell({
   const dotColor = hasOverdue ? "bg-amber-400/80" : "bg-red-400/80";
 
   const textColor = isOver
-    ? "#fff"
+    ? "var(--ln-theme-text)"
     : selected
-      ? "#fff"
+      ? "var(--ln-theme-text)"
       : isToday
-        ? "rgba(253,230,138,0.9)"
-        : "rgba(255,255,255,0.6)";
+        ? "var(--ln-theme-today)"
+        : "var(--ln-theme-text-secondary)";
 
   return (
     <button
@@ -175,11 +175,12 @@ export function WeekCalendar({
   // 箭头按钮样式
   const arrowBtn =
     "flex h-8 w-6 shrink-0 items-center justify-center rounded-md transition hover:bg-white/8";
-  const arrowColor = "rgba(255,255,255,0.6)";
+  const arrowColor = "var(--ln-theme-text-secondary)";
 
   return (
     <nav
-      className="shrink-0 flex items-center gap-0.5 px-1 py-1.5 border-b border-white/10 select-none"
+      className="shrink-0 flex items-center gap-0.5 px-1 py-1.5 select-none"
+      style={{ borderBottom: `1px solid var(--ln-theme-border-light)` }}
       data-tauri-no-drag
     >
       {/* 左箭头 */}
@@ -229,7 +230,7 @@ export function WeekCalendar({
         <button
           type="button"
           className="shrink-0 rounded-md px-1.5 py-1 text-[11px] transition hover:bg-white/8"
-          style={{ color: "rgba(255,255,255,0.55)" }}
+          style={{ color: "var(--ln-theme-text-muted)" }}
           onClick={() => {
             setWeekOffset(0);
             onSelectDate(null);

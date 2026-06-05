@@ -100,11 +100,15 @@ export function TodoRow({
         onContextMenu(e);
       }}
       className={
-        "flex min-h-12 cursor-default items-center gap-1 border-b border-white/15 px-2 touch-none sm:px-3 " +
-        (selected ? "bg-white/18 " : "hover:bg-white/10 ") +
-        (sortable.isDragging ? "opacity-0" : "")
+        "flex min-h-12 cursor-default items-center gap-1 px-2 touch-none sm:px-3 " +
+        (sortable.isDragging ? "opacity-0" : "") +
+        (!selected ? " hover:bg-[var(--ln-theme-surface-hover)]" : "")
       }
-      style={style}
+      style={{
+        ...style,
+        borderBottom: `1px solid var(--ln-theme-border-light)`,
+        background: selected ? "var(--ln-theme-surface-active)" : "transparent",
+      }}
     >
       {/* 循环待办：显示循环图标，不可点击完成 */}
       {todo.isRecurring ? (
@@ -174,7 +178,8 @@ export function TodoRow({
           <textarea
             ref={textareaRef}
             data-tauri-no-drag
-            className="min-h-10 w-0 flex-1 resize-none bg-transparent text-sm leading-snug text-white/90 outline-none ring-0"
+            className="min-h-10 w-0 flex-1 resize-none bg-transparent text-sm leading-snug outline-none ring-0"
+            style={{ color: "var(--ln-theme-text)" }}
             rows={2}
             value={todo.text}
             onChange={(e) => onChangeText(e.target.value)}
@@ -198,9 +203,10 @@ export function TodoRow({
           <div className="flex min-w-0 flex-1 flex-col py-0.5">
             <span
               className={
-                "whitespace-pre-wrap text-sm leading-snug text-white/90" +
+                "whitespace-pre-wrap text-sm leading-snug" +
                 (todo.completed && !todo.isRecurring ? " opacity-50 line-through" : "")
               }
+              style={{ color: "var(--ln-theme-text)" }}
             >
               {todo.text || (locale === "zh-CN" ? "（空）" : "(empty)")}
             </span>
@@ -217,9 +223,9 @@ export function TodoRow({
                   </span>
                 ) : null}
                 {dueLabel ? (
-                  <span className={"text-xs " +
-                    (todo.completed ? "text-white/30" : "text-white/50")
-                  }>
+                  <span className="text-xs"
+                    style={{ color: todo.completed ? "var(--ln-theme-text-muted)" : "var(--ln-theme-text-secondary)" }}
+                  >
                     {dueLabel}
                   </span>
                 ) : null}

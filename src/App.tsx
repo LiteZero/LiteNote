@@ -9,6 +9,12 @@ function App() {
   useAppInit(true);
 
   const initialized = useSettingsStore((s) => s.initialized);
+  const theme = useSettingsStore((s) => s.theme);
+
+  // 绑定 data-theme 到 html 根节点
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     if (initialized) {

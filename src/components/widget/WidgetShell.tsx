@@ -208,9 +208,9 @@ export function WidgetShell() {
         data-tauri-drag-region
         style={{
           opacity: panelOpacity,
-          background: "var(--ln-glass-bg)",
-          backdropFilter: "blur(var(--ln-glass-blur))",
-          WebkitBackdropFilter: "blur(var(--ln-glass-blur))",
+          background: "var(--ln-theme-bg)",
+          backdropFilter: "var(--ln-theme-backdrop)",
+          WebkitBackdropFilter: "var(--ln-theme-backdrop)",
         }}
       >
         <HeaderBar

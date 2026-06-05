@@ -19,13 +19,17 @@ export function FooterBar({
   const mk = (key: MessageKey) => t(locale, key);
 
   const btnBase =
-    "flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-sky-50 transition";
-  const btnActive = `${btnBase} hover:bg-white/20`;
-  const btnDisabled = `${btnBase} cursor-not-allowed text-sky-100/35`;
+    "flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm transition";
+  const btnActive = `${btnBase} hover:bg-[var(--ln-theme-surface-hover)]`;
+  const btnDisabled = `${btnBase} cursor-not-allowed`;
+
+  const btnStyle = { color: "var(--ln-theme-text)" };
+  const btnDisabledStyle = { color: "var(--ln-theme-text-muted)" };
 
   return (
     <footer
-      className="shrink-0 border-t border-white/25 bg-white/10 px-2 py-2"
+      className="shrink-0 px-2 py-2"
+      style={{ borderTop: `1px solid var(--ln-theme-border)`, background: "var(--ln-theme-surface)" }}
       data-tauri-no-drag
     >
       <div className="flex items-center justify-between gap-2">
@@ -34,6 +38,7 @@ export function FooterBar({
           title={mk("footerAddTooltip")}
           onClick={onAdd}
           className={btnActive}
+          style={btnStyle}
         >
           <svg
             className="h-4 w-4 shrink-0 opacity-95"
@@ -58,6 +63,7 @@ export function FooterBar({
           disabled={clearCompletedDisabled}
           onClick={onClearClick}
           className={clearCompletedDisabled ? btnDisabled : btnActive}
+          style={clearCompletedDisabled ? btnDisabledStyle : btnStyle}
         >
           <svg
             className="h-4 w-4 shrink-0 opacity-95"

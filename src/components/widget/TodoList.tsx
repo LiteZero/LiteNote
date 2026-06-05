@@ -51,7 +51,8 @@ export function TodoList({
   }, [todos]);
 
   const emptyCenter =
-    "flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6 text-center text-sm text-white/60";
+    "flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6 text-center text-sm";
+const emptyStyle = { color: "var(--ln-theme-text-secondary)" } as React.CSSProperties;
 
   const renderRows = (list: TodoItem[]) =>
     list.map((todo) => (
@@ -71,7 +72,7 @@ export function TodoList({
 
   if (todos.length === 0) {
     return (
-      <div className={emptyCenter}>
+      <div className={emptyCenter} style={emptyStyle}>
         {emptyHint}
       </div>
     );
@@ -81,7 +82,7 @@ export function TodoList({
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="min-h-0 flex-1 overflow-y-auto">
         {activeSorted.length === 0 ? (
-          <div className={emptyCenter}>
+          <div className={emptyCenter} style={emptyStyle}>
             {completedSorted.length > 0
               ? t(locale, "emptyNoActive")
               : emptyHint}
@@ -98,12 +99,14 @@ export function TodoList({
 
       {completedSorted.length > 0 ? (
         <div
-          className="shrink-0 border-t border-white/15 bg-white/[0.08]"
+          className="shrink-0"
+          style={{ borderTop: `1px solid var(--ln-theme-border)`, background: "var(--ln-theme-surface)" }}
           data-tauri-no-drag
         >
           <button
             type="button"
-            className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-white/85 hover:bg-white/[0.06]"
+            className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-[var(--ln-theme-surface-hover)]"
+            style={{ color: "var(--ln-theme-text)" }}
             aria-expanded={completedExpanded}
             onClick={() => setCompletedExpanded((v) => !v)}
           >
@@ -113,12 +116,12 @@ export function TodoList({
                 completedSorted.length,
               )}
             </span>
-            <span className="text-xs text-white/50" aria-hidden>
+            <span className="text-xs" style={{ color: "var(--ln-theme-text-secondary)" }} aria-hidden>
               {completedExpanded ? "▼" : "▶"}
             </span>
           </button>
           {completedExpanded ? (
-            <div className="max-h-[min(40vh,12rem)] overflow-y-auto border-t border-white/10">
+            <div className="max-h-[min(40vh,12rem)] overflow-y-auto" style={{ borderTop: `1px solid var(--ln-theme-border-light)` }}>
               {renderRows(completedSorted)}
             </div>
           ) : null}

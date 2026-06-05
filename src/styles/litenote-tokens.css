@@ -46,3 +46,65 @@
     rgba(45, 105, 145, 0.88) 100%
   );
 }
+
+/* ══════════════════════════════════════════════════
+   主题色彩变量
+   ══════════════════════════════════════════════════ */
+
+/* 玻璃主题（默认） */
+:root[data-theme="glass"],
+:root:not([data-theme]) {
+  --ln-theme-bg: var(--ln-glass-bg);
+  --ln-theme-backdrop: blur(var(--ln-glass-blur));
+  --ln-theme-surface: rgba(255, 255, 255, 0.08);
+  --ln-theme-surface-hover: rgba(255, 255, 255, 0.12);
+  --ln-theme-surface-active: rgba(255, 255, 255, 0.18);
+  --ln-theme-text: #ffffff;
+  --ln-theme-text-secondary: rgba(255, 255, 255, 0.55);
+  --ln-theme-text-muted: rgba(255, 255, 255, 0.35);
+  --ln-theme-border: rgba(255, 255, 255, 0.12);
+  --ln-theme-border-light: rgba(255, 255, 255, 0.08);
+  --ln-theme-today: rgba(253, 230, 138, 0.9);
+  --ln-theme-today-bg: rgba(255, 255, 255, 0.06);
+  --ln-theme-selected-bg: rgba(255, 255, 255, 0.12);
+  --ln-theme-header-border: rgba(255, 255, 255, 0.2);
+  --ln-theme-overlay: rgba(0, 0, 0, 0.4);
+}
+
+/* 深色主题 */
+:root[data-theme="dark"] {
+  --ln-theme-bg: #0f172a;
+  --ln-theme-backdrop: none;
+  --ln-theme-surface: #1e293b;
+  --ln-theme-surface-hover: #334155;
+  --ln-theme-surface-active: #475569;
+  --ln-theme-text: #e2e8f0;
+  --ln-theme-text-secondary: #94a3b8;
+  --ln-theme-text-muted: #64748b;
+  --ln-theme-border: #334155;
+  --ln-theme-border-light: #1e293b;
+  --ln-theme-today: #4ade80;
+  --ln-theme-today-bg: rgba(74, 222, 128, 0.1);
+  --ln-theme-selected-bg: #334155;
+  --ln-theme-header-border: #334155;
+  --ln-theme-overlay: rgba(0, 0, 0, 0.5);
+}
+
+/* 浅色主题 */
+:root[data-theme="light"] {
+  --ln-theme-bg: #f8fafc;
+  --ln-theme-backdrop: none;
+  --ln-theme-surface: #ffffff;
+  --ln-theme-surface-hover: #f1f5f9;
+  --ln-theme-surface-active: #e2e8f0;
+  --ln-theme-text: #1e293b;
+  --ln-theme-text-secondary: #64748b;
+  --ln-theme-text-muted: #94a3b8;
+  --ln-theme-border: #e2e8f0;
+  --ln-theme-border-light: #f1f5f9;
+  --ln-theme-today: #16a34a;
+  --ln-theme-today-bg: rgba(22, 163, 74, 0.08);
+  --ln-theme-selected-bg: #e2e8f0;
+  --ln-theme-header-border: #e2e8f0;
+  --ln-theme-overlay: rgba(0, 0, 0, 0.1);
+}

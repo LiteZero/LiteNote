@@ -33,11 +33,11 @@ export function ClockSection({ locale }: ClockSectionProps) {
   const lunar = formatLunarLine(now, locale);
 
   return (
-    <section className="shrink-0 cursor-default select-none border-b border-white/20 px-3 py-6">
-      <div className="text-center font-mono text-5xl font-light leading-none tabular-nums tracking-wide text-white">
+    <section className="shrink-0 cursor-default select-none px-3 py-6" style={{ borderBottom: `1px solid var(--ln-theme-border)` }}>
+      <div className="text-center font-mono text-5xl font-light leading-none tabular-nums tracking-wide" style={{ color: "var(--ln-theme-text)" }}>
         {timeStr}
       </div>
-      <div className="mt-4 flex justify-between gap-1 px-1 text-xs text-white/85">
+      <div className="mt-4 flex justify-between gap-1 px-1 text-xs" style={{ color: "var(--ln-theme-text-secondary)" }}>
         <span className="min-w-0 shrink truncate">{lunar}</span>
         <span className="shrink-0">{dateStr}</span>
         <span className="min-w-0 shrink truncate text-right">{weekdayStr}</span>

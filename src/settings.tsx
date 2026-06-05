@@ -15,10 +15,12 @@ function SettingsApp() {
   const panelOpacity = useSettingsStore((s) => s.panelOpacity);
   const clockCollapsed = useSettingsStore((s) => s.clockCollapsed);
   const autoStart = useSettingsStore((s) => s.autoStart);
+  const theme = useSettingsStore((s) => s.theme);
   const setLocaleMode = useSettingsStore((s) => s.setLocaleMode);
   const setPanelOpacity = useSettingsStore((s) => s.setPanelOpacity);
   const setClockCollapsed = useSettingsStore((s) => s.setClockCollapsed);
   const setAutoStart = useSettingsStore((s) => s.setAutoStart);
+  const setTheme = useSettingsStore((s) => s.setTheme);
 
   const locale = useMemo(() => resolveLocale(localeMode), [localeMode]);
   const heading = useMemo(
@@ -56,6 +58,8 @@ function SettingsApp() {
             onSetClockCollapsed={setClockCollapsed}
             autoStart={autoStart}
             onSetAutoStart={setAutoStart}
+            theme={theme}
+            onSetTheme={setTheme}
           />
         </div>
       </div>

@@ -14,7 +14,8 @@ interface HeaderBarProps {
 }
 
 const iconBtn =
-  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sky-50 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-100/50";
+  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-100/50";
+const iconStyle = { color: "var(--ln-theme-text)" } as React.CSSProperties;
 
 export function HeaderBar({
   locale,
@@ -35,18 +36,19 @@ export function HeaderBar({
 
   return (
     <header
-      className="flex h-11 shrink-0 cursor-grab select-none items-center border-b border-white/20 px-1 active:cursor-grabbing"
+      className="flex h-11 shrink-0 cursor-grab select-none items-center px-1 active:cursor-grabbing"
+      style={{ borderBottom: `1px solid var(--ln-theme-header-border)` }}
       data-tauri-drag-region
     >
       <div
         className="flex min-h-0 min-w-0 flex-1 items-center gap-1.5 self-stretch pl-2 pr-2"
         data-tauri-drag-region
       >
-        <span className="truncate text-sm font-semibold leading-none text-white">
+        <span className="truncate text-sm font-semibold leading-none" style={{ color: "var(--ln-theme-text)" }}>
           {mk("appName")}
         </span>
         {version ? (
-          <span className="shrink-0 text-xs leading-none text-white/35">{version}</span>
+          <span className="shrink-0 text-xs leading-none" style={{ color: "var(--ln-theme-text-muted)" }}>{version}</span>
         ) : null}
       </div>
       <div
@@ -56,6 +58,7 @@ export function HeaderBar({
         <button
           type="button"
           className={iconBtn}
+          style={iconStyle}
           title={mk("helpTitle")}
           onClick={onOpenHelp}
         >
@@ -68,6 +71,7 @@ export function HeaderBar({
         <button
           type="button"
           className={iconBtn}
+          style={iconStyle}
           title={mk("settings")}
           onClick={onOpenSettings}
         >
@@ -88,6 +92,7 @@ export function HeaderBar({
         <button
           type="button"
           className={iconBtn}
+          style={iconStyle}
           title={alwaysOnTop ? mk("alwaysOnTopCancel") : mk("alwaysOnTop")}
           aria-label={alwaysOnTop ? mk("alwaysOnTopCancel") : mk("alwaysOnTop")}
           aria-pressed={alwaysOnTop}
@@ -113,7 +118,7 @@ export function HeaderBar({
             />
           </svg>
         </button>
-        <button type="button" className={iconBtn} title={mk("hideWindow")} onClick={onHide}>
+        <button type="button" className={iconBtn} style={iconStyle} title={mk("hideWindow")} onClick={onHide}>
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M6 12h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>

@@ -9,6 +9,8 @@ let _db: Database | null = null;
 
 // ──────────────── 设置项默认值（单一真实来源） ────────────────
 
+export type ThemeId = "glass" | "dark" | "light";
+
 /** 所有设置项的默认值，作为唯一真实来源 */
 export const DEFAULT_SETTINGS = {
   clockCollapsed: true,
@@ -16,6 +18,7 @@ export const DEFAULT_SETTINGS = {
   localeMode: "system" as LocaleMode,
   alwaysOnTop: false,
   autoStart: true,
+  theme: "glass" as ThemeId,
 };
 
 /** 设置项的运行时类型（非字面量） */
@@ -25,6 +28,7 @@ export interface AppSettings {
   readonly localeMode: LocaleMode;
   readonly alwaysOnTop: boolean;
   readonly autoStart: boolean;
+  readonly theme: ThemeId;
 }
 
 export async function getDb(): Promise<Database> {
