@@ -6,11 +6,13 @@ use tauri::{
     image::Image,
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Manager, Runtime, WebviewUrl, WebviewWindowBuilder,
+    AppHandle, LogicalPosition, Manager, Runtime, WebviewUrl,
+    WebviewWindowBuilder,
 };
 #[cfg(target_os = "macos")]
-use tauri::{LogicalPosition, LogicalSize, RunEvent, TitleBarStyle};
+use tauri::{RunEvent, TitleBarStyle};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
+use tauri_plugin_notification::NotificationExt;
 
 /// 提醒提前量（毫秒），默认 15 分钟
 const REMIND_ADVANCE_MS: i64 = 15 * 60 * 1000;
@@ -238,6 +240,65 @@ fn compute_reminder_position<R: Runtime>(app: &AppHandle<R>) -> (f64, f64) {
     (60.0, 60.0)
 }
 
+/// 格式化通知正文：`待办内容 —— 还有 X 分钟到期`
+fn format_due_text(text: &str, due_date_ms: i64, now_ms: i64) -> String {
+    if due_date_ms <= 0 {
+        return text.to_string();
+    }
+    let diff_ms = due_date_ms - now_ms;
+    let abs_ms = diff_ms.abs();
+    let total_min = abs_ms / 60_000;
+
+    let time_part = if abs_ms < 30_000 {
+        "已到截止时间".to_string()
+    } else if diff_ms > 0 {
+        if total_min < 60 {
+            format!("还有 {} 分钟到期", total_min)
+        } else {
+            let h = total_min / 60;
+            let m = total_min % 60;
+            if m == 0 {
+                format!("还有 {} 小时到期", h)
+            } else {
+                format!("还有 {} 小时 {} 分钟到期", h, m)
+            }
+        }
+    } else {
+        if total_min < 60 {
+            format!("已逾期 {} 分钟", total_min)
+        } else {
+            let h = total_min / 60;
+            let m = total_min % 60;
+            if m == 0 {
+                format!("已逾期 {} 小时", h)
+            } else {
+                format!("已逾期 {} 小时 {} 分钟", h, m)
+            }
+        }
+    };
+    format!("{} —— {}", text, time_part)
+}
+
+/// 从 settings 表读取 reminderMode 配置，默认 "popup"
+fn read_reminder_mode(conn: &Connection) -> String {
+    let has_table: bool = conn
+        .query_row(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='settings' LIMIT 1",
+            [],
+            |_| Ok(()),
+        )
+        .is_ok();
+    if !has_table {
+        return "popup".to_string();
+    }
+    conn.query_row(
+        "SELECT value FROM settings WHERE key = 'reminderMode'",
+        [],
+        |row| row.get::<_, String>(0),
+    )
+    .unwrap_or_else(|_| "popup".to_string())
+}
+
 /// 创建并展示一条独立提醒弹窗（置顶 / 不可被主窗口遮挡）
 fn show_reminder_window<R: Runtime>(app: &AppHandle<R>, row: &ReminderRow) {
     let label = format!("reminder-{}", row.id);
@@ -258,19 +319,18 @@ fn show_reminder_window<R: Runtime>(app: &AppHandle<R>, row: &ReminderRow) {
 
     let (x, y) = compute_reminder_position(app);
 
-    // 直接 visible(true)，避免「先建后显」的多步操作在某些时序下窗口出不来
+    // 先以不可见方式创建，避免 build() 时窗口管理器将其放到屏幕中央
     let mut builder = WebviewWindowBuilder::new(app, &label, WebviewUrl::App(url.into()))
         .title("提醒")
-        .inner_size(380.0, 260.0)
-        .min_inner_size(380.0, 260.0)
+        .inner_size(380.0, 160.0)
         .resizable(false)
         .decorations(false)
         .transparent(true)            // 配合 WebView 透明背景，彻底去掉 1px 边
-        .shadow(false)                // macOS 上不需要窗口级阴影（卡片自带 box-shadow）
+        .shadow(false)                // 卡片自带 box-shadow，不需要窗口级阴影
         .always_on_top(true)
         .skip_taskbar(true)
         .focused(false)               // 关键：首次弹出也不抢焦点，让用户主动点
-        .visible(true);
+        .visible(false);              // 先不可见，设好位置后再显示
 
     #[cfg(target_os = "macos")]
     {
@@ -283,16 +343,37 @@ fn show_reminder_window<R: Runtime>(app: &AppHandle<R>, row: &ReminderRow) {
 
     match result {
         Ok(win) => {
-            // 设置位置（macOS LogicalPosition 走 scale 自动处理）
+            // 设好位置再显示，确保窗口出现在正确位置（屏幕右上角）
             let _ = win.set_position(LogicalPosition::new(x, y));
-            let _ = win.set_size(LogicalSize::new(380.0, 260.0));
-            let _ = win.show();
-            // 完全不抢焦点：
-            // - builder 上面已设 focused(false)
-            // - 这里不调 set_focus
-            // - 不调 request_user_attention（避免 Dock 弹跳 / 系统提示音）
-            //   —— 用户当前可能在写代码 / 视频会议，弹窗只是「视觉提醒」
-            //   用户主动点击弹窗即可聚焦 + 操作
+
+            // 针对不同系统进行「不抢焦点」的显示
+            #[cfg(target_os = "windows")]
+            {
+                use tauri::Manager;
+                if let Ok(hwnd) = win.hwnd() {
+                    unsafe {
+                        // SW_SHOWNOACTIVATE = 4 : 显示但不激活
+                        extern "system" {
+                            fn ShowWindow(hwnd: isize, nCmdShow: i32) -> i32;
+                        }
+                        ShowWindow(hwnd.0, 4);
+                    }
+                } else {
+                    let _ = win.show();
+                }
+            }
+
+            #[cfg(target_os = "macos")]
+            {
+                // macOS 上 .show() 配合 focused(false) 通常不抢焦点
+                let _ = win.show();
+            }
+
+            #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+            {
+                let _ = win.show();
+            }
+
             println!("[LiteNote] 提醒弹窗已创建: label={}", label);
         }
         Err(e) => {
@@ -335,17 +416,47 @@ fn check_and_notify(app: &AppHandle, db_path: &std::path::Path) {
         return;
     }
 
+    // 读取用户设置的提醒方式
+    let reminder_mode = read_reminder_mode(&conn);
+
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_millis() as i64;
 
-    // 1. 提醒检查：开独立弹窗（不再发系统通知）
+    // 1. 提醒检查
     let rows = query_due_reminders(&conn, now);
     if !rows.is_empty() {
-        println!("[LiteNote] 发现 {} 条待办需要提醒", rows.len());
+        println!(
+            "[LiteNote] 发现 {} 条待办需要提醒 (mode={})",
+            rows.len(),
+            reminder_mode
+        );
         for row in &rows {
-            show_reminder_window(app, row);
+            match reminder_mode.as_str() {
+                "system" => {
+                    // 系统通知：使用 tauri-plugin-notification
+                    let body = format_due_text(&row.text, row.due_date, now);
+                    if let Err(e) = app
+                        .notification()
+                        .builder()
+                        .title("LiteNote 提醒")
+                        .body(&body)
+                        .show()
+                    {
+                        eprintln!("[LiteNote] 发送系统通知失败: {e}");
+                    } else {
+                        println!(
+                            "[LiteNote] 系统通知已发送: label={}",
+                            row.id
+                        );
+                    }
+                }
+                _ => {
+                    // 默认弹窗
+                    show_reminder_window(app, row);
+                }
+            }
             mark_reminded(&conn, &row.id);
         }
     }
@@ -510,6 +621,7 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,

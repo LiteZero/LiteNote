@@ -73,6 +73,9 @@ export const messages = {
     toastExportSuccess: "导出成功",
     shortcutLabel: "快捷键",
     shortcutValue: "Cmd/Ctrl + Shift + L",
+    reminderModeLabel: "提醒方式",
+    reminderModePopup: "弹窗提醒",
+    reminderModeSystem: "系统通知",
   },
   en: {
     appName: "LiteNote",
@@ -149,6 +152,9 @@ export const messages = {
     toastExportSuccess: "Export successful",
     shortcutLabel: "Shortcut",
     shortcutValue: "Cmd/Ctrl + Shift + L",
+    reminderModeLabel: "Notification",
+    reminderModePopup: "Popup",
+    reminderModeSystem: "System",
   },
 } as const;
 

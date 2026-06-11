@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { emit } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -72,6 +73,8 @@ export function ReminderWindow() {
         action,
         delayMinutes: delayMinutes ?? null,
       });
+      // 通知其他窗口（主窗口）重新从 DB 加载 todo 数据
+      emit("litenote-todos-updated", { ts: Date.now() }).catch(() => {});
       setTimeout(() => {
         getCurrentWindow().close().catch(() => {});
       }, 200);
@@ -230,7 +233,7 @@ function ReminderStyles() {
         inset: 0;
         background: transparent;
         display: flex;
-        align-items: flex-end;            /* 卡片贴 WebView 底部，给上方留 popover 空间 */
+        align-items: flex-end;            /* 卡片贴 WebView 底部 */
         justify-content: stretch;
         font-family: var(--ln-font-stack, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif);
         -webkit-user-select: none;
@@ -240,13 +243,11 @@ function ReminderStyles() {
       }
       .reminder-card {
         width: 100%;
-        height: 180px;                     /* 卡片固定 180 高，贴在 WebView 底部 */
+        height: 160px;
         border-radius: 12px;
-        background: linear-gradient(180deg, rgba(40,40,45,0.92), rgba(25,25,30,0.94));
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.35);
-        color: #fff;
+        background: #fff;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+        color: #1a1a1a;
         display: flex;
         flex-direction: column;
         overflow: visible;                 /* 允许 popover 溢出到卡片上方 */
@@ -259,13 +260,12 @@ function ReminderStyles() {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 12px;
+        padding: 10px 14px 4px;
         flex-shrink: 0;
       }
       .reminder-dot {
         width: 7px; height: 7px; border-radius: 50%;
         background: #ff9500;
-        box-shadow: 0 0 6px rgba(255,149,0,0.6);
         flex-shrink: 0;
       }
       .reminder-title {
@@ -273,23 +273,23 @@ function ReminderStyles() {
         font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.2px;
-        color: rgba(255,255,255,0.85);
+        color: #666;
       }
       .reminder-close {
         background: transparent;
         border: 0;
-        color: rgba(255,255,255,0.5);
+        color: #999;
         font-size: 16px;
         line-height: 1;
         width: 20px; height: 20px;
         border-radius: 4px;
         cursor: pointer;
       }
-      .reminder-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
+      .reminder-close:hover { background: rgba(0,0,0,0.06); color: #333; }
 
       /* ─── body ─── */
       .reminder-body {
-        padding: 4px 14px 8px;
+        padding: 2px 14px 6px;
         display: flex;
         flex-direction: column;
         gap: 2px;
@@ -300,6 +300,7 @@ function ReminderStyles() {
         font-size: 15px;
         font-weight: 500;
         line-height: 1.3;
+        color: #1a1a1a;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -308,14 +309,14 @@ function ReminderStyles() {
       }
       .reminder-due {
         font-size: 11px;
-        color: rgba(255,255,255,0.6);
+        color: #999;
       }
 
       /* ─── 底部 双按钮 ─── */
       .reminder-actions {
         display: flex;
         gap: 8px;
-        padding: 6px 12px 10px;
+        padding: 4px 14px 10px;
         margin-top: auto;
         flex-shrink: 0;
       }
@@ -323,19 +324,19 @@ function ReminderStyles() {
         flex: 1;
         height: 30px;
         border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.14);
-        background: rgba(255,255,255,0.08);
-        color: #fff;
+        border: 1px solid #e0e0e0;
+        background: #f5f5f5;
+        color: #333;
         font-size: 13px;
         cursor: pointer;
         transition: background 0.15s;
       }
-      .reminder-btn:hover { background: rgba(255,255,255,0.14); }
+      .reminder-btn:hover { background: #ebebeb; }
       .reminder-btn:disabled { opacity: 0.5; cursor: not-allowed; }
       .reminder-btn-primary {
         background: #ff9500;
         border-color: transparent;
-        color: #1a1a1a;
+        color: #fff;
         font-weight: 600;
       }
       .reminder-btn-primary:hover { background: #ffa624; }
@@ -348,18 +349,16 @@ function ReminderStyles() {
         bottom: calc(100% + 6px);
         right: 0;
         min-width: 280px;
-        background: rgba(30,30,32,0.98);
-        border: 1px solid rgba(255,255,255,0.12);
+        background: #fff;
+        border: 1px solid #e8e8e8;
         border-radius: 10px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         padding: 8px;
         z-index: 100;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
         display: flex;
         flex-direction: column;
         gap: 6px;
-        animation: slideUp 0.18s var(--ln-ease-out, ease-out);
+        animation: slideUp 0.18s ease-out;
       }
       @keyframes slideUp {
         from { opacity: 0; transform: translateY(4px); }
@@ -373,16 +372,16 @@ function ReminderStyles() {
         flex: 1;
         height: 28px;
         border-radius: 14px;
-        border: 1px solid rgba(255,255,255,0.14);
-        background: rgba(255,255,255,0.06);
-        color: rgba(255,255,255,0.9);
+        border: 1px solid #e0e0e0;
+        background: #f5f5f5;
+        color: #333;
         font-size: 12px;
         font-weight: 500;
         cursor: pointer;
         transition: background 0.15s;
       }
-      .reminder-pill:hover { background: rgba(255,255,255,0.16); }
-      .reminder-pill:active { background: rgba(255,149,0,0.3); }
+      .reminder-pill:hover { background: #ebebeb; }
+      .reminder-pill:active { background: rgba(255,149,0,0.15); }
       .reminder-pill:disabled { opacity: 0.5; cursor: not-allowed; }
 
       .reminder-custom-row {
@@ -393,10 +392,10 @@ function ReminderStyles() {
       .reminder-custom-input {
         width: 56px;
         height: 26px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.14);
+        background: #f5f5f5;
+        border: 1px solid #e0e0e0;
         border-radius: 5px;
-        color: #fff;
+        color: #333;
         font-size: 12px;
         padding: 0 6px;
         outline: none;
@@ -406,7 +405,7 @@ function ReminderStyles() {
       .reminder-custom-input:disabled { opacity: 0.5; }
       .reminder-custom-unit {
         font-size: 11px;
-        color: rgba(255,255,255,0.5);
+        color: #999;
       }
       .reminder-custom-ok {
         margin-left: auto;
@@ -415,7 +414,7 @@ function ReminderStyles() {
         border-radius: 5px;
         border: 0;
         background: #ff9500;
-        color: #1a1a1a;
+        color: #fff;
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;

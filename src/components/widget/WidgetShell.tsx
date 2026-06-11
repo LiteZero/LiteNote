@@ -57,6 +57,8 @@ export function WidgetShell() {
   const setAutoStart = useSettingsStore((s) => s.setAutoStart);
   const theme = useSettingsStore((s) => s.theme);
   const setTheme = useSettingsStore((s) => s.setTheme);
+  const reminderMode = useSettingsStore((s) => s.reminderMode);
+  const setReminderMode = useSettingsStore((s) => s.setReminderMode);
   const lastSettingsError = useSettingsStore((s) => s.lastError);
   const clearSettingsError = useSettingsStore((s) => s.clearError);
   const lastTodoError = useTodoStore((s) => s.lastError);
@@ -320,6 +322,8 @@ export function WidgetShell() {
           onSetAutoStart={setAutoStart}
           theme={theme}
           onSetTheme={setTheme}
+          reminderMode={reminderMode}
+          onSetReminderMode={setReminderMode}
           onClose={() => setShowSettings(false)}
         />
 

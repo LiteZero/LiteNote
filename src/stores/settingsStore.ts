@@ -16,6 +16,7 @@ export interface SettingsState {
   alwaysOnTop: boolean;
   autoStart: boolean;
   theme: ThemeId;
+  reminderMode: "popup" | "system";
   initialized: boolean;
   /** 最近一次 DB 写入错误信息，供 UI 展示 */
   lastError: string | null;
@@ -29,6 +30,7 @@ export interface SettingsActions {
   setAlwaysOnTop: (v: boolean) => void;
   setAutoStart: (v: boolean) => void;
   setTheme: (t: ThemeId) => void;
+  setReminderMode: (m: "popup" | "system") => void;
   /** 供外部同步调用：用 DB 最新值覆盖 store */
   reloadFromDb: () => Promise<void>;
   clearError: () => void;
@@ -157,6 +159,16 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       dbWrite(
         saveSetting("theme", t),
         "saveSetting(theme)",
+        (msg) => set({ lastError: msg }),
+        emitSettingsChanged,
+      );
+    },
+
+    setReminderMode: (m) => {
+      set({ reminderMode: m });
+      dbWrite(
+        saveSetting("reminderMode", m),
+        "saveSetting(reminderMode)",
         (msg) => set({ lastError: msg }),
         emitSettingsChanged,
       );

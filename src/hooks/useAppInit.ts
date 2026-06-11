@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useTodoStore } from "@/stores/todoStore";
+import { useTodoStore, initTodosSync } from "@/stores/todoStore";
 import { useSettingsStore, initSettingsSync } from "@/stores/settingsStore";
 
 /**
@@ -7,7 +7,7 @@ import { useSettingsStore, initSettingsSync } from "@/stores/settingsStore";
  *
  * 职责：
  * 1. 从 DB 加载 todos 和 settings
- * 2. 注册跨窗口设置同步监听
+ * 2. 注册跨窗口设置和待办同步监听
  *
  * 通过 initialized 标志确保只初始化一次（即使 StrictMode 双挂载）。
  *
@@ -20,7 +20,8 @@ export function useAppInit(loadTodos = true): void {
 
   const hasTodoInited = useRef(false);
   const hasSettingsInited = useRef(false);
-  const syncCleanup = useRef<(() => void) | null>(null);
+  const settingsSyncCleanup = useRef<(() => void) | null>(null);
+  const todosSyncCleanup = useRef<(() => void) | null>(null);
 
   // 初始化设置
   useEffect(() => {
@@ -43,13 +44,18 @@ export function useAppInit(loadTodos = true): void {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 注册跨窗口设置同步
+  // 注册跨窗口同步监听
   useEffect(() => {
-    syncCleanup.current = initSettingsSync();
+    settingsSyncCleanup.current = initSettingsSync();
+    todosSyncCleanup.current = initTodosSync();
     return () => {
-      if (syncCleanup.current) {
-        syncCleanup.current();
-        syncCleanup.current = null;
+      if (settingsSyncCleanup.current) {
+        settingsSyncCleanup.current();
+        settingsSyncCleanup.current = null;
+      }
+      if (todosSyncCleanup.current) {
+        todosSyncCleanup.current();
+        todosSyncCleanup.current = null;
       }
     };
   }, []);

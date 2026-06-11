@@ -18,6 +18,8 @@ interface SettingsModalProps {
   onSetAutoStart: (v: boolean) => void;
   theme: ThemeId;
   onSetTheme: (t: ThemeId) => void;
+  reminderMode: "popup" | "system";
+  onSetReminderMode: (m: "popup" | "system") => void;
   onClose: () => void;
 }
 
@@ -188,6 +190,8 @@ export function SettingsModal({
   onSetAutoStart,
   theme,
   onSetTheme,
+  reminderMode,
+  onSetReminderMode,
   onClose,
 }: SettingsModalProps) {
   const mk = (key: MessageKey) => t(locale, key);
@@ -302,6 +306,20 @@ export function SettingsModal({
         </section>
 
         {/* 分隔线 */}
+        <div className="mb-5" style={{ borderTop: `1px solid var(--ln-theme-border-light)` }} />
+
+        {/* 提醒方式 */}
+        <section className="mb-4">
+          <CustomSelect
+            label={mk("reminderModeLabel")}
+            value={reminderMode}
+            onChange={onSetReminderMode}
+            options={[
+              { value: "popup" as const, label: mk("reminderModePopup") },
+              { value: "system" as const, label: mk("reminderModeSystem") },
+            ]}
+          />
+        </section>
         <div className="mb-5" style={{ borderTop: `1px solid var(--ln-theme-border-light)` }} />
 
         {/* 主题 */}

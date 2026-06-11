@@ -1,3 +1,4 @@
+import { listen } from "@tauri-apps/api/event";
 import { create } from "zustand";
 import type { TodoItem, RecurrenceType } from "@/types/todo";
 import {
@@ -20,6 +21,7 @@ export interface TodoStoreState {
 
 export interface TodoStoreActions {
   init: () => Promise<void>;
+  reloadFromDb: () => Promise<void>;
   addTodo: () => string;
   /** 实时更新文本（仅内存，不写 DB） */
   updateTodoText: (id: string, text: string) => void;
@@ -83,6 +85,12 @@ export const useTodoStore = create<TodoStoreState & TodoStoreActions>()(
     init: async () => {
       const todos = await loadTodos();
       set({ todos });
+    },
+
+    reloadFromDb: async () => {
+      const todos = await loadTodos();
+      set({ todos });
+      console.log("[LiteNote] Todos 已从数据库重新加载");
     },
 
     // ── Todo 操作（乐观更新：同步改 state，异步写 DB） ──
@@ -329,3 +337,36 @@ export const useTodoStore = create<TodoStoreState & TodoStoreActions>()(
     },
   }),
 );
+
+// ──────────────── 跨窗口待办同步 ────────────────
+
+const TODOS_EVENT = "litenote-todos-updated";
+
+let _todosSyncInitDone = false;
+
+/**
+ * 注册跨窗口待办同步监听。
+ * 当其他窗口（如提醒弹窗）修改了 DB 中的 todo 数据后，
+ * 会通过 Tauri 事件通知本窗口重新从数据库加载。
+ */
+export function initTodosSync(): () => void {
+  if (_todosSyncInitDone) return () => {};
+  _todosSyncInitDone = true;
+
+  let unlisten: (() => void) | null = null;
+
+  listen<{ ts: number; source?: string }>(TODOS_EVENT, async (event) => {
+    // 跳过自身发出的消息
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    if (event.payload.source === getCurrentWindow().label) return;
+
+    console.log("[LiteNote] 收到待办更新事件，重新加载数据");
+    await useTodoStore.getState().reloadFromDb();
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return () => {
+    if (unlisten) unlisten();
+  };
+}

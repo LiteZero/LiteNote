@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS = {
   alwaysOnTop: false,
   autoStart: true,
   theme: "glass" as ThemeId,
+  reminderMode: "popup" as "popup" | "system",
 };
 
 /** 设置项的运行时类型（非字面量） */
@@ -31,6 +32,7 @@ export interface AppSettings {
   readonly alwaysOnTop: boolean;
   readonly autoStart: boolean;
   readonly theme: ThemeId;
+  readonly reminderMode: "popup" | "system";
 }
 
 export async function getDb(): Promise<Database> {
