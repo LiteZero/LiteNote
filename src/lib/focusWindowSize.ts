@@ -7,6 +7,12 @@ export const FOCUS_DRAG_HANDLE_HEIGHT = 16;
 /** 专注模式单行高度（与 FocusTodoRow min-h-12 一致） */
 export const FOCUS_ROW_HEIGHT = 48;
 
+/** 专注模式列表最多展示行数，超出在列表内滚动 */
+export const FOCUS_MAX_VISIBLE_ROWS = 5;
+
+/** 专注模式列表区最大高度（不含拖拽条） */
+export const FOCUS_MAX_LIST_HEIGHT = FOCUS_MAX_VISIBLE_ROWS * FOCUS_ROW_HEIGHT;
+
 /** 无未完成事项时列表区高度（不含拖拽条） */
 export const FOCUS_EMPTY_CONTENT_HEIGHT = 104;
 
@@ -15,7 +21,7 @@ export const FOCUS_EMPTY_HEIGHT =
   FOCUS_DRAG_HANDLE_HEIGHT + FOCUS_EMPTY_CONTENT_HEIGHT;
 
 export const FOCUS_MIN_HEIGHT = FOCUS_DRAG_HANDLE_HEIGHT + FOCUS_ROW_HEIGHT;
-export const FOCUS_MAX_HEIGHT = 420;
+export const FOCUS_MAX_HEIGHT = FOCUS_DRAG_HANDLE_HEIGHT + FOCUS_MAX_LIST_HEIGHT;
 
 export const DEFAULT_FULL_WINDOW_WIDTH = 360;
 export const DEFAULT_FULL_WINDOW_HEIGHT = 620;

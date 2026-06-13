@@ -6,6 +6,7 @@ import {
 import type { Locale } from "@/i18n";
 import { t } from "@/i18n";
 import { sortTodos } from "@/lib/todoSort";
+import { FOCUS_MAX_LIST_HEIGHT } from "@/lib/focusWindowSize";
 import type { TodoItem } from "@/types/todo";
 import { TodoRow } from "./TodoRow";
 
@@ -88,7 +89,12 @@ export function TodoList({
 
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-y-auto">{renderRows(activeSorted)}</div>
+        <div
+          className="min-h-0 flex-1 overflow-y-auto"
+          style={{ maxHeight: FOCUS_MAX_LIST_HEIGHT }}
+        >
+          {renderRows(activeSorted)}
+        </div>
       </div>
     );
   }
