@@ -9,6 +9,8 @@ interface FooterBarProps {
   onClearClick: () => void;
   /** 无已完成项时禁用清除按钮 */
   clearCompletedDisabled?: boolean;
+  /** 面板透明度 */
+  opacity?: number;
 }
 
 export function FooterBar({
@@ -17,6 +19,7 @@ export function FooterBar({
   onExport,
   onClearClick,
   clearCompletedDisabled = false,
+  opacity = 1,
 }: FooterBarProps) {
   const mk = (key: MessageKey) => t(locale, key);
 
@@ -29,12 +32,18 @@ export function FooterBar({
   const btnDisabledStyle = { color: "var(--ln-theme-text-muted)" };
 
   return (
-    <footer
-      className="shrink-0 px-2 py-2"
-      style={{ borderTop: `1px solid var(--ln-theme-border)`, background: "var(--ln-theme-surface)" }}
-      data-tauri-no-drag
-    >
-      <div className="flex items-center justify-between gap-2">
+    <footer className="relative shrink-0" data-tauri-no-drag>
+      {/* 背景层（受透明度影响） */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          borderTop: `1px solid var(--ln-theme-border)`,
+          background: "var(--ln-theme-surface)",
+          opacity,
+        }}
+      />
+      {/* 内容层（文字清晰） */}
+      <div className="relative z-10 flex items-center justify-between gap-2 px-2 py-2">
         <button
           type="button"
           title={mk("footerAddTooltip")}

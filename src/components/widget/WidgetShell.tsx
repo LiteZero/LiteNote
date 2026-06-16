@@ -110,7 +110,8 @@ export function WidgetShell() {
   const noopContextMenu = useCallback((_e: React.MouseEvent, _id: string) => {}, []);
   const noopChangeText = useCallback((_id: string, _text: string) => {}, []);
 
-  const panelStyle = useMemo(
+  // 背景层样式：包含透明度和实际背景
+  const bgLayerStyle: React.CSSProperties = useMemo(
     () => ({
       opacity: panelOpacity,
       background: "var(--ln-theme-bg)",
@@ -272,30 +273,39 @@ export function WidgetShell() {
       ) : null}
 
       {focusMode ? (
-        <div
-          className="flex h-full min-h-0 w-full flex-col overflow-hidden"
-          style={panelStyle}
-        >
-          <FocusDragHandle />
-          <TodoList
-            focusMode
-            locale={locale}
-            todos={focusActiveTodos}
-            selectedId={null}
-            editingId={null}
-            emptyHint={`${t(locale, "focusEmptyHint")}\n${t(locale, "focusModeHint")}`}
-            onSelect={noop}
-            onContextMenu={noopContextMenu}
-            onChangeText={noopChangeText}
-            onEndEdit={noop}
-            onToggleCompleted={toggleCompleted}
+        <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden">
+          {/* 透明背景层 */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0"
+            style={bgLayerStyle}
           />
+          {/* 内容层 - 文字永远清晰可见 */}
+          <div className="relative z-10 flex h-full min-h-0 w-full flex-col">
+            <FocusDragHandle />
+            <TodoList
+              focusMode
+              locale={locale}
+              todos={focusActiveTodos}
+              selectedId={null}
+              editingId={null}
+              emptyHint={`${t(locale, "focusEmptyHint")}\n${t(locale, "focusModeHint")}`}
+              onSelect={noop}
+              onContextMenu={noopContextMenu}
+              onChangeText={noopChangeText}
+              onEndEdit={noop}
+              onToggleCompleted={toggleCompleted}
+            />
+          </div>
         </div>
       ) : (
-      <div
-        className="flex h-full min-h-0 w-full flex-col overflow-hidden"
-        style={panelStyle}
-      >
+      <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden">
+        {/* 透明背景层 */}
+        <div
+          className="pointer-events-none absolute inset-0 z-0"
+          style={bgLayerStyle}
+        />
+        {/* 内容层 - 文字永远清晰可见 */}
+        <div className="relative z-10 flex h-full min-h-0 w-full flex-col">
         <HeaderBar
           locale={locale}
           alwaysOnTop={alwaysOnTop}
@@ -355,6 +365,7 @@ export function WidgetShell() {
           onAdd={handleAddWithDate}
           onExport={handleExport}
           onClearClick={() => setConfirmClear(true)}
+          opacity={panelOpacity}
         />
 
         {/* 设置模态框 */}
@@ -382,7 +393,8 @@ export function WidgetShell() {
           locale={locale}
           onClose={() => setShowAbout(false)}
         />
-      </div>
+        </div>
+        </div>
       )}
 
       {!focusMode && menu && menuTodo ? (
